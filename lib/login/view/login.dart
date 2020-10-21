@@ -14,29 +14,29 @@ class _LoginViewState extends State<LoginView> {
   @override
   void initState() {
     super.initState();
-
     passwordNode = new FocusNode();
   }
 
   @override
   void dispose() {
     super.dispose();
-
     passwordNode.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LoginBloc, LoginState>(
-      listener: (context, state) {
-        if(state.error.status == true) {
-          print(state.error.value);
-          context.bloc<LoginBloc>().add(LoginErrorHasRetrive());
-        }
-      },
-      child: Scaffold(
-          appBar: AppBar(title: Text('Login')),
-          body: BlocBuilder<LoginBloc, LoginState>(
+    return Scaffold(
+      appBar: AppBar(title: Text('Login')),
+      body: BlocListener<LoginBloc, LoginState>(
+        listener: (context, state) {
+          if(state.error.status == true) {
+            Scaffold.of(context).showSnackBar(SnackBar(content: Text(state.error.value)));
+            context.bloc<LoginBloc>().add(LoginErrorHasRetrive());
+          } else if (state.isAuthenticated == true) {
+            Scaffold.of(context).showSnackBar(SnackBar(content: Text("Login Berhasil")));
+          }
+        },
+        child: BlocBuilder<LoginBloc, LoginState>(
             builder: (context, state) {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
@@ -107,7 +107,11 @@ class _LoginViewState extends State<LoginView> {
                               icon: Icon(Icons.login),
                               elevation: 0,
                               label: Text('Login'),
-                              onPressed: () => context.bloc<LoginBloc>().add(LoginSubmitted()),
+                              onPressed: () {
+                                if(_formKey.currentState.validate()) {
+                                  context.bloc<LoginBloc>().add(LoginSubmitted());
+                                }
+                              },
                             ),
                           ),
                           SizedBox(
@@ -134,8 +138,8 @@ class _LoginViewState extends State<LoginView> {
                 ),
               );
             }
-          )
-      ),
+        ),
+      )
     );
   }
 }

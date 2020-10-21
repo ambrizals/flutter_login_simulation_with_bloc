@@ -49,7 +49,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     if(bool == true) {
       yield state.copyWith(
-        loading: false
+        loading: false,
+        isAuthenticated: true
       );
     } else {
       try {
